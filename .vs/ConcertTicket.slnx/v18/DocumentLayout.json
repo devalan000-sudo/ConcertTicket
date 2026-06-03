@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Alanl\\source\\repos\\ConcertTicket\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FE581D03-2F31-6A7C-7368-47E8B08E5D1E}|ConcertTicket\\ConcertTicket.csproj|c:\\users\\alanl\\source\\repos\\concertticket\\concertticket\\domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FE581D03-2F31-6A7C-7368-47E8B08E5D1E}|ConcertTicket\\ConcertTicket.csproj|solutionrelative:concertticket\\domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +14,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 335,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\Alanl\\source\\repos\\ConcertTicket\\ConcertTicket\\Domain\\Entities\\User.cs",
+              "RelativeDocumentMoniker": "ConcertTicket\\Domain\\Entities\\User.cs",
+              "ToolTip": "C:\\Users\\Alanl\\source\\repos\\ConcertTicket\\ConcertTicket\\Domain\\Entities\\User.cs",
+              "RelativeToolTip": "ConcertTicket\\Domain\\Entities\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T04:25:36.488Z",
+              "EditorCaption": ""
             }
           ]
         }

@@ -10,6 +10,8 @@ namespace ConcertTicket.Domain.Entities
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsEmailVerified { get; set; } = false;
+        public string VerificationToken { get; set; }
 
         //Enum
         public UserRole Role { get; set; }
