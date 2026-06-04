@@ -14,7 +14,7 @@ namespace ConcertTicket.Infrastructure.Data
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<Zone> Zones { get; set; }
-        public DbSet<Reservation> Reservatiions { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

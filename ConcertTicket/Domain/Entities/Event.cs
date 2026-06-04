@@ -1,5 +1,4 @@
 ﻿using ConcertTicket.Domain.Enums;
-using System.ComponentModel;
 
 namespace ConcertTicket.Domain.Entities
 {
@@ -7,7 +6,7 @@ namespace ConcertTicket.Domain.Entities
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
-        public string Descrption { get; set; }
+        public string Description { get; set; }
         public DateTime Date {  get; set; }
         public string ImageUrl { get; set; }
         public bool IsActive { get; set; }
