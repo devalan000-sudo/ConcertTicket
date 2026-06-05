@@ -40,6 +40,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IVenueService, VenueService>();
 
 var app = builder.Build();
 
