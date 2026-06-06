@@ -1,9 +1,7 @@
 ﻿using ConcertTicket.Application.DTOs.Event;
 using ConcertTicket.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace ConcertTicket.API.Controllers
 {
@@ -32,11 +30,11 @@ namespace ConcertTicket.API.Controllers
                 var response = await _eventService.CreateAsync(request);
                 return Ok(response);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return BadRequest(new { Message = ex.Message });
             }
-    }
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -44,4 +42,5 @@ namespace ConcertTicket.API.Controllers
             var events = await _eventService.GetAllAsync();
             return Ok(events);
         }
+    }
 }

@@ -1,10 +1,13 @@
+using ConcertTicket.API.Workers;
 using ConcertTicket.Application.Interfaces;
 using ConcertTicket.Application.Services;
+using ConcertTicket.Infrastructure.Caching;
 using ConcertTicket.Infrastructure.Data;
 using ConcertTicket.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +44,14 @@ builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IVenueService, VenueService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddHostedService<ReservationCleaUpWorker>();
+
+// Configuracion de Redis
+var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection")
+    ?? throw new InvalidOperationException("Redis connection string missing.");
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 var app = builder.Build();
 
