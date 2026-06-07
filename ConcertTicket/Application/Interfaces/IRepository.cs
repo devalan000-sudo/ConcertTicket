@@ -15,5 +15,8 @@ namespace ConcertTicket.Application.Interfaces
         //Actualizacion y borrado
         void Update(T entity);
         void Delete(T entity);
+
+        //Ejecutar en SQL y no en RAM
+        IQueryable<T> AsQueryable();
     }
 }

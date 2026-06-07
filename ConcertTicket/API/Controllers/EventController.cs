@@ -1,4 +1,5 @@
 ﻿using ConcertTicket.Application.DTOs.Event;
+using ConcertTicket.Application.DTOs.Pagination;
 using ConcertTicket.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,10 +38,10 @@ namespace ConcertTicket.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] EventQueryFilter filter)
         {
-            var events = await _eventService.GetAllAsync();
-            return Ok(events);
+            var pagedResult = await _eventService.GetAllPagedAsync(filter);
+            return Ok(pagedResult);
         }
     }
 }

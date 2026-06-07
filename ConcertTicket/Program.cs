@@ -43,14 +43,26 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IVenueService, VenueService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddHostedService<ReservationCleaUpWorker>();
+builder.Services.AddScoped<IPaymentService, StripePaymentService>();
+
+// Configuracion de Stripe
+Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"]
+    ?? throw new InvalidOperationException("Stripe SecretKey missing.");
 
 // Configuracion de Redis
 var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection")
     ?? throw new InvalidOperationException("Redis connection string missing.");
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(new ConfigurationOptions
+    {
+        EndPoints = { redisConnectionString },
+        AbortOnConnectFail = false,
+        ConnectTimeout = 5000
+    }));
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 var app = builder.Build();

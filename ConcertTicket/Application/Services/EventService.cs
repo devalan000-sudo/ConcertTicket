@@ -1,6 +1,9 @@
-﻿using ConcertTicket.Application.DTOs.Event;
+﻿using System.Linq;
+using ConcertTicket.Application.DTOs.Event;
+using ConcertTicket.Application.DTOs.Pagination;
 using ConcertTicket.Application.Interfaces;
 using ConcertTicket.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConcertTicket.Application.Services
 {
@@ -8,11 +11,13 @@ namespace ConcertTicket.Application.Services
     {
         private readonly IRepository<Event> _eventRepository;
         private readonly IRepository<Venue> _venueRepository;
+        private readonly ICacheService _cacheService;
 
-        public EventService(IRepository<Event> eventRepository, IRepository<Venue> venueRepository)
+        public EventService(IRepository<Event> eventRepository, IRepository<Venue> venueRepository, ICacheService cacheService)
         {
             _eventRepository = eventRepository;
             _venueRepository = venueRepository;
+            _cacheService = cacheService;
         }
 
         public async Task<EventResposeDto> CreateAsync(CreateEventDto request)
@@ -31,7 +36,7 @@ namespace ConcertTicket.Application.Services
                 Title = request.Title,
                 Description = request.Description,
                 Date = request.Date,
-                ImageUrl = request.imageUrl,
+                ImageUrl = request.ImageUrl,
                 Category = request.Category,
                 VenueId = request.VenueId,
                 IsActive = true,
@@ -48,6 +53,11 @@ namespace ConcertTicket.Application.Services
 
             await _eventRepository.AddAsync(newEvent);
 
+            foreach (var zone in newEvent.Zones)
+            {
+                await _cacheService.SetAsync($"zone:{zone.Id}:available", zone.TotalCapacity, null);
+            }
+
             return new EventResposeDto
             {
                 Id = newEvent.Id,
@@ -58,20 +68,38 @@ namespace ConcertTicket.Application.Services
             };
         }
 
-        public async Task<IEnumerable<EventResposeDto>> GetAllAsync()
+        public async Task<PageResponse<EventResposeDto>> GetAllPagedAsync(EventQueryFilter filter)
         {
-            var events = await _eventRepository.GetAllAsync();
+            var query = _eventRepository.AsQueryable();
 
-            return events.Select(e => new EventResposeDto
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+                query = query.Where(e => e.Title.Contains(filter.SearchTerm));
+
+            if (!string.IsNullOrWhiteSpace(filter.Category))
+                query = query.Where(e => e.Category.ToString() == filter.Category);
+
+            var totalRecords = await query.CountAsync();
+
+            var events = await query
+                .OrderBy(e => e.Date)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(e => new EventResposeDto
+                {
+                    Id = e.Id,
+                    Title = e.Title,
+                    Date = e.Date,
+                    Category = e.Category.ToString(),
+                    TotalZones = e.Zones != null ? e.Zones.Count : 0
+                }).ToListAsync();
+
+            return new PageResponse<EventResposeDto>
             {
-                Id = e.Id,
-                Title = e.Title,
-                Date = e.Date,
-                Category = e.Category.ToString(),
-                TotalZones = e.Zones?.Count ?? 0
-            }).ToList();
+                Data = events,
+                TotalRecords = totalRecords,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
-
-        //
     }
 }

@@ -47,5 +47,10 @@ namespace ConcertTicket.Infrastructure.Data
             _dbSet.Remove(entity);
             _context.SaveChanges();
         }
+
+        public IQueryable<T> AsQueryable()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

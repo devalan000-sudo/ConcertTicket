@@ -6,14 +6,11 @@ namespace ConcertTicket.Application.DTOs.Event
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime Date {  get; set; }
-        public string imageUrl { get; set; }
+        public DateTime Date { get; set; }
+        public string ImageUrl { get; set; }
 
-        //El Enum
         public EventCategory Category { get; set; }
-        //El ID del recinto que ya creamos
         public Guid VenueId { get; set; }
-        //Lista de zonas a crear
-        public List<CreateZoneDto> Zones { get; set; } 
+        public List<CreateZoneDto> Zones { get; set; } = new();
     }
 }

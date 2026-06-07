@@ -36,5 +36,26 @@ namespace ConcertTicket.API.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetMyReservation()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+
+                var userId = Guid.Parse(userIdClaim);
+
+                var myReservations = await _reservationService.GetUserReservationsAsync(userId);
+
+                return Ok(myReservations);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }

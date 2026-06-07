@@ -2,6 +2,7 @@
 using ConcertTicket.Application.Interfaces;
 using ConcertTicket.Domain.Entities;
 using ConcertTicket.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConcertTicket.Application.Services
 {
@@ -22,6 +23,19 @@ namespace ConcertTicket.Application.Services
             _reservationRepository = reservationRepository;
             _zoneRepository = zoneRepository;
             _cacheService = cacheService;
+        }
+
+        public async Task ConfirmPaymentAsync(Guid reservationId)
+        {
+            var reservation = await _reservationRepository.GetByIdAsync(reservationId);
+
+            if (reservation != null && reservation.Status == ReservationStatus.Pending)
+            {
+                reservation.Status = ReservationStatus.Completed;
+                _reservationRepository.Update(reservation);
+
+                await _cacheService.RemoveAsync($"reservation:{reservationId}:lock");
+            }
         }
 
         public async Task<ReservationResponseDto> CreateReservationAsync(CreateReservationDto request, Guid userId)
@@ -88,6 +102,41 @@ namespace ConcertTicket.Application.Services
             };
 
             //
+        }
+
+        public async Task<IEnumerable<MyReservationDto>> GetUserReservationsAsync(Guid userId)
+        {
+            var query = _reservationRepository.AsQueryable();
+
+            //Traemos las reservas del usuario, incluyendo toda la jerarquia de datos
+            var userResevations = await query
+                .Where(r => r.UserId == userId)
+                .Include(r => r.Tickets)
+                .ThenInclude(t => t.Zone)
+                .ThenInclude(z => z.Event)
+                .ThenInclude(e => e.Venue) //Recinto para mostrarlo en el boleto
+                .OrderByDescending(r => r.CreatedAt) // Las compras mas recientes primero
+                .ToListAsync();
+
+            //Mapemoas nuestras entidades de base de datos a DTOs limpios
+            return userResevations.Select(r => new MyReservationDto
+            {
+                ReservationId = r.Id,
+                PurchaseDate = r.CreatedAt,
+                TotalAmount = r.TotalAmount,
+                Status = r.Status.ToString(),
+                Tickets = r.Tickets.Select(t => new MyTicketDto
+                {
+                    TicketId = t.Id,
+                    EventTitle = t.Zone.Event.Title,
+                    EventDate = t.Zone.Event.Date,
+                    VenueName = t.Zone.Event.Venue.Name,
+                    ZoneName = t.Zone.Name,
+                    QRToken = t.QRToken,
+                    IsScanned = t.IsScanned
+                }).ToList()
+            });
+
         }
     }
 }
